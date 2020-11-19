@@ -1,4 +1,4 @@
-var width = 1200;
+var width = 800;
 var height = 800;
 
 d3.csv("starbucksfoods.csv", function (csv) {
@@ -22,8 +22,7 @@ d3.csv("starbucksfoods.csv", function (csv) {
 
     var bars = graph.append("g");
 
-    var xScale = d3.scaleLinear().range([0, width]).domain([0, d3.max(csv, function(d) {
-        console.log(d.Calories);
+    var xScale = d3.scaleLinear().range([0, width * 0.6]).domain([0, d3.max(csv, function(d) {
         return d.Calories;
     })]);
     var yScale = d3.scaleBand().rangeRound([0, height-50], 0.3).domain(csv.map(function(d) {
@@ -31,17 +30,17 @@ d3.csv("starbucksfoods.csv", function (csv) {
     }));
 
     var yAxis = d3.axisLeft(yScale);
-    var xAxis = d3.axisTop(xScale);
+    var xAxis = g => g.attr("transform", "translate(250, 20)").call(d3.axisTop(xScale));
 
     bars.append('g')
         .attr('class', 'y axis')
-        .attr('transform', 'translate(200, 0)')
+        .attr('transform', 'translate(250, 0)')
         .call(yAxis);
 
     bars
         .append("g")
         .attr("class", "x axis")
-        .attr("transform", "translate(200," + (height - 50) + ")")
+        .attr("transform", "translate(250," + (height - 50) + ")")
         .call(xAxis);
 
     bars
@@ -51,7 +50,7 @@ d3.csv("starbucksfoods.csv", function (csv) {
         .enter()
         .append("rect")
         .attr("class", "bar")
-        .attr("transform", "translate(180, 0)")
+        .attr("transform", "translate(220, 0)")
         .attr("x", 30)
         .attr("y", function (d) {
             return yScale(d.Item);
@@ -63,7 +62,6 @@ d3.csv("starbucksfoods.csv", function (csv) {
             // return xScale(getValue(d));
         })
         .attr("height", function (d) {
-            // console.log(yScale.bandwidth());
             return yScale.bandwidth() * 0.8;
         });
 
@@ -93,8 +91,6 @@ d3.csv("starbucksfoods.csv", function (csv) {
                 .attr('width', function(d) {
                     return xScale(d.frequency);
                 });
-
-
 
             //change x-axis scale
 
