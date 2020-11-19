@@ -63,6 +63,10 @@ d3.csv("starbucksfoods.csv", function (csv) {
         })
         .attr("height", function (d) {
             return yScale.bandwidth() * 0.8;
+        })
+        .on('click', function(d) {
+            console.log(d)
+            generatePieChart(d)
         });
 
     d3.select("#button")
@@ -106,6 +110,47 @@ d3.csv("starbucksfoods.csv", function (csv) {
 
     function getSelection() {
         return d3.select("#nutrientSelect").property("value");
+    }
+
+    function generatePieChart(data) {
+        const radius = 200
+
+        var color = d3.scaleOrdinal(['#4daf4a','#377eb8','#ff7f00', '#984ea3'])
+        dataSet = [data.Fat, data.Carb, data.Fiber, data.Protein]
+        console.log(dataSet)
+        calories = [9, 4, 0, 4]
+        // Set the calroies
+        
+        calorieSet = dataSet.map( ( elem, i ) => calories[ i ] * elem )
+        console.log(calorieSet)
+         var pieChart = d3.select("#pieChart")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        g = pieChart.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+        // Generate the pie
+        var pie = d3.pie();
+    
+        // Generate the arcs
+        var arc = d3.arc()
+                    .innerRadius(0)
+                    .outerRadius(radius);
+    
+        //Generate groups
+        var arcs = g.selectAll("arc")
+                    .data(pie(dataSet))
+                    .enter()
+                    .append("g")
+                    .attr("class", "arc")
+    
+        //Draw arc paths
+        arcs.append("path")
+            .attr("fill", function(d, i) {
+                console.log('COLOR')
+                return color(i);
+            })
+            .attr("d", arc);
     }
 
 });
