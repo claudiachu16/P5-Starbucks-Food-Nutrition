@@ -122,7 +122,38 @@ d3.csv("starbucksfoods.csv", function (csv) {
         .on('click', function() {
             //************************** FINISH THIS FUNCTION FOR FILTERING ********************************
             //name of selected category
-            console.log(d3.select("#categorySelect").property("value"));
+            // console.log('FILTER CLICKED: ' + d3.select("#categorySelect").property("value"));
+
+            var selectValue = d3.select("#categorySelect").property("value");
+
+            // show all lines
+            if (selectValue == 'All' || selectValue == null || selectValue == '') {
+                console.log('ALL SELECTED');
+                d3.selectAll('.lines')
+                    .transition().duration(200)
+                    .attr('visibility', 'visible');
+                return;
+            }
+
+            // get lines beloning to selected category
+            var selected = d3.selectAll('.lines')
+                .filter(function (d) {
+                    // console.log(d);
+                    return d.Category == selectValue;
+                });
+            // get lines not belonging to selected category
+            var notSelected = d3.selectAll('.lines')
+                .filter(function (d) {
+                    // console.log(d);
+                    return d.Category != selectValue;
+                });
+            // make selected / notSelected visible / not visible
+            selected
+                .transition().duration(200)
+                .attr('visibility', 'visible');
+            notSelected
+                .transition().duration(200)
+                .attr('visibility', 'hidden');
         });
 
 
