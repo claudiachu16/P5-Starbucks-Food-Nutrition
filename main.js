@@ -91,6 +91,8 @@ d3.csv("starbucksfoods.csv", function (csv) {
         .style("stroke", "#00704A")
         .style("opacity", 0.6)
         .on('click', function (d) {
+            console.log('click line: d');
+            console.log(d);         // the food item {item, calories, etc}
             generatePieChart(d);
         })
         .on("mouseover", highlight)
@@ -130,6 +132,7 @@ d3.csv("starbucksfoods.csv", function (csv) {
                 console.log('ALL SELECTED');
                 d3.selectAll('.lines')
                     .transition().duration(200)
+                    .style("stroke-width", 1)
                     .attr('visibility', 'visible');
                 return;
             }
@@ -148,10 +151,12 @@ d3.csv("starbucksfoods.csv", function (csv) {
                 });
             // make selected / notSelected visible / not visible
             selected
-                .transition().duration(200)
+                // .transition().duration(200)      // dont know if this is necessary
+                // .style("stroke-width", 5)
                 .attr('visibility', 'visible');
             notSelected
-                .transition().duration(200)
+                // .transition().duration(500)
+                // .style("stroke-width", 1)
                 .attr('visibility', 'hidden');
         });
 
