@@ -5,7 +5,7 @@ d3.csv("starbucksfoods.csv", function (csv) {
 
 
     //margin values to format PCP within div
-    var margin = {top: 30, right: 10, bottom: 10, left: 0},
+    var margin = { top: 30, right: 10, bottom: 10, left: 0 },
         width = 1500 - margin.left - margin.right,
         height = 800 - margin.top - margin.bottom;
 
@@ -19,7 +19,7 @@ d3.csv("starbucksfoods.csv", function (csv) {
 
 
     //get the 5 axes values (Calories, Fat, Carb, Fiber Protein)
-    var dimensions = d3.keys(csv[0]).filter( function(d) {
+    var dimensions = d3.keys(csv[0]).filter(function (d) {
         return (d != "Item" && d != "Category");
     });
 
@@ -29,7 +29,7 @@ d3.csv("starbucksfoods.csv", function (csv) {
     for (i in dimensions) {
         var dimName = dimensions[i];
         y[dimName] = d3.scaleLinear()
-            .domain( d3.extent(csv, function(d) { return +d[dimName]; }) )
+            .domain(d3.extent(csv, function (d) { return +d[dimName]; }))
             .range([height, 0])
     }
 
@@ -43,7 +43,7 @@ d3.csv("starbucksfoods.csv", function (csv) {
 
     //a function that takes in a row of csv/a starbucks item and returns the (x,y) coordinates of line to draw
     function path(d) {
-        return d3.line()(dimensions.map( function(p) {
+        return d3.line()(dimensions.map(function (p) {
             return [x(p), y[p](d[p])];
         }));
     }
@@ -58,7 +58,7 @@ d3.csv("starbucksfoods.csv", function (csv) {
 
 
     //highlights hovered lines/paths
-    var highlight = function(d) {
+    var highlight = function (d) {
         //select the line being hovered and change styling
         d3.select(this)
             .transition().duration(200)
@@ -70,7 +70,7 @@ d3.csv("starbucksfoods.csv", function (csv) {
 
 
     //un-highlights lines/paths and returns all to default
-    var unHighlight = function(d) {
+    var unHighlight = function (d) {
         d3.selectAll(".lines")
             .transition().duration(200).delay(200)
             .style("stroke", "#00704A")
@@ -90,7 +90,7 @@ d3.csv("starbucksfoods.csv", function (csv) {
         //color them all the same ***NOTE too many colors (15 for 15 categories)
         .style("stroke", "#00704A")
         .style("opacity", 0.6)
-        .on('click', function(d) {
+        .on('click', function (d) {
             generatePieChart(d);
         })
         .on("mouseover", highlight)
@@ -103,14 +103,14 @@ d3.csv("starbucksfoods.csv", function (csv) {
         //each axis is in its own group
         .append("g")
         //translate the axis to its correct position along the width
-        .attr("transform", function(d) { return "translate(" + x(d) + ")"; })
-        .each( function(d) { d3.select(this).call(d3.axisLeft().scale(y[d])); })
+        .attr("transform", function (d) { return "translate(" + x(d) + ")"; })
+        .each(function (d) { d3.select(this).call(d3.axisLeft().scale(y[d])); })
         .attr("class", "axis")
         //axis title and styling
         .append("text")
         .style("text-anchor", "middle")
         .attr("y", -9)
-        .text( function(d) { return d; })
+        .text(function (d) { return d; })
         .style("stroke", "black");
 
 
@@ -119,10 +119,40 @@ d3.csv("starbucksfoods.csv", function (csv) {
         .style("border", "1px solid black")
         .text('Filter Data')
         //only displays the lines for the selected category
-        .on('click', function() {
-            //************************** FINISH THIS FUNCTION FOR FILTERING ********************************
+        .on('click', function () {
             //name of selected category
-            console.log(d3.select("#categorySelect").property("value"));
+            // console.log('FILTER CLICKED: ' + d3.select("#categorySelect").property("value"));
+
+            var selectValue = d3.select("#categorySelect").property("value");
+
+            // show all lines
+            if (selectValue == 'All' || selectValue == null || selectValue == '') {
+                console.log('ALL SELECTED');
+                d3.selectAll('.lines')
+                    .transition().duration(200)
+                    .attr('visibility', 'visible');
+                return;
+            }
+
+            // get lines beloning to selected category
+            var selected = d3.selectAll('.lines')
+                .filter(function (d) {
+                    // console.log(d);
+                    return d.Category == selectValue;
+                });
+            // get lines not belonging to selected category
+            var notSelected = d3.selectAll('.lines')
+                .filter(function (d) {
+                    // console.log(d);
+                    return d.Category != selectValue;
+                });
+            // make selected / notSelected visible / not visible
+            selected
+                .transition().duration(200)
+                .attr('visibility', 'visible');
+            notSelected
+                .transition().duration(200)
+                .attr('visibility', 'hidden');
         });
 
 
@@ -130,15 +160,15 @@ d3.csv("starbucksfoods.csv", function (csv) {
     function generatePieChart(data) {
         const radius = 200
 
-        var color = d3.scaleOrdinal(['#4daf4a','#377eb8','#ff7f00', '#984ea3'])
+        var color = d3.scaleOrdinal(['#4daf4a', '#377eb8', '#ff7f00', '#984ea3'])
         dataSet = [data.Fat, data.Carb, data.Fiber, data.Protein]
         console.log(dataSet)
         calories = [9, 4, 0, 4]
         // Set the calroies
-        
-        calorieSet = dataSet.map( ( elem, i ) => calories[ i ] * elem )
+
+        calorieSet = dataSet.map((elem, i) => calories[i] * elem)
         console.log(calorieSet)
-         var pieChart = d3.select("#pieChart")
+        var pieChart = d3.select("#pieChart")
             .append("svg")
             .attr("width", width)
             .attr("height", height);
@@ -146,22 +176,22 @@ d3.csv("starbucksfoods.csv", function (csv) {
         g = pieChart.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
         // Generate the pie
         var pie = d3.pie();
-    
+
         // Generate the arcs
         var arc = d3.arc()
-                    .innerRadius(0)
-                    .outerRadius(radius);
-    
+            .innerRadius(0)
+            .outerRadius(radius);
+
         //Generate groups
         var arcs = g.selectAll("arc")
-                    .data(pie(dataSet))
-                    .enter()
-                    .append("g")
-                    .attr("class", "arc")
-    
+            .data(pie(dataSet))
+            .enter()
+            .append("g")
+            .attr("class", "arc")
+
         //Draw arc paths
         arcs.append("path")
-            .attr("fill", function(d, i) {
+            .attr("fill", function (d, i) {
                 console.log('COLOR')
                 return color(i);
             })
