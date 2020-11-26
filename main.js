@@ -1,5 +1,8 @@
 var width = 1500;
 var height = 800;
+const radius = 200
+const calories = [9, 4, 0, 4];        // # calories each macronutrient provides
+const pieChartColors = d3.scaleOrdinal(['gold', 'blueviolet', 'green', 'darksalmon'])   // fat, carb, fiber, protein
 
 d3.csv("starbucksfoods.csv", function (csv) {
 
@@ -157,6 +160,9 @@ d3.csv("starbucksfoods.csv", function (csv) {
                 .attr('visibility', 'hidden');
         });
 
+
+    // --- PIE INITIALIZATION (start) ---
+
     // set up pie chart variables so generatePieChart function updates these
     var pieChart = d3.select("#pieChart")
         .append("svg")
@@ -164,46 +170,66 @@ d3.csv("starbucksfoods.csv", function (csv) {
         .attr("height", height);
     var g = pieChart.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-    //creates the pie chart of the % make-up of calories per macronutrient
+    // Generate the pie
+    var pie = d3.pie();
+
+    // Generate the arcs
+    var arc = d3.arc()
+        .innerRadius(0)
+        .outerRadius(radius);
+
+    // shape helper to build arcs:
+    var arcGenerator = d3.arc()
+        .innerRadius(0)
+        .outerRadius(radius)
+
+    // --- pie initialization (end) ---
+
+    // function to create the pie chart of the % make-up of calories per macronutrient
     function generatePieChart(data) {
-        const radius = 200
 
-        var color = d3.scaleOrdinal(['#4daf4a', '#377eb8', '#ff7f00', '#984ea3'])
-        dataSet = [data.Fat, data.Carb, data.Fiber, data.Protein]
-        console.log(dataSet)
-        calories = [9, 4, 0, 4]
-        // Set the calroies
 
-        calorieSet = dataSet.map((elem, i) => calories[i] * elem)
-        console.log(calorieSet)
-        pieChart = d3.select("#pieChart")
-            .append("svg")
-            .attr("width", width)
-            .attr("height", height);
+        console.log(data);
 
-        // g = pieChart.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
-        // Generate the pie
-        var pie = d3.pie();
+        var dataSet = [data.Fat, data.Carb, data.Fiber, data.Protein]
 
-        // Generate the arcs
-        var arc = d3.arc()
-            .innerRadius(0)
-            .outerRadius(radius);
+        // calculate # of calories each macronutrient contributes in total
+        var calorieSet = dataSet.map((elem, i) => calories[i] * elem)
+
+        // logCheckCalories(calorieSet, data.Calories);
+
+
+        // delete previous arcs (elements w/ class 'arc')
+        pieChart.selectAll(".arc").remove();
 
         //Generate groups
         var arcs = g.selectAll("arc")
-            .data(pie(dataSet))
+            .data(pie(calorieSet))
             .enter()
             .append("g")
-            .attr("class", "arc")
+            .attr("class", "arc");
 
         //Draw arc paths
         arcs.append("path")
             .attr("fill", function (d, i) {
                 console.log('COLOR')
-                return color(i);
+                return pieChartColors(i);
             })
-            .attr("d", arc);
-    }
+            .attr("d", arc)
+            // controls color/width of spaces around slices
+            .attr("stroke", "white")
+            .style("stroke-width", "2px")
+
+
+    } // generatePieChart
 
 });
+
+function logCheckCalories(calSet, totalCal) {
+    // logging function, unecessary for functionality
+    // just checking if calories calculated = total calories listed
+    var sum = calSet.reduce(function (a, b) {
+        return a + b;
+    }, 0);
+    console.log('SUM: ' + sum + ' | total calories: ' + totalCal);
+}
