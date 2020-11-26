@@ -132,7 +132,6 @@ d3.csv("starbucksfoods.csv", function (csv) {
                 console.log('ALL SELECTED');
                 d3.selectAll('.lines')
                     .transition().duration(200)
-                    .style("stroke-width", 1)
                     .attr('visibility', 'visible');
                 return;
             }
@@ -151,12 +150,10 @@ d3.csv("starbucksfoods.csv", function (csv) {
                 });
             // make selected / notSelected visible / not visible
             selected
-                // .transition().duration(200)      // dont know if this is necessary
-                // .style("stroke-width", 5)
+                .transition().duration(200)
                 .attr('visibility', 'visible');
             notSelected
-                // .transition().duration(500)
-                // .style("stroke-width", 1)
+                .transition().duration(200)
                 .attr('visibility', 'hidden');
         });
 
