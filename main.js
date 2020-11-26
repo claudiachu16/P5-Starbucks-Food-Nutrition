@@ -96,6 +96,7 @@ d3.csv("starbucksfoods.csv", function (csv) {
         .on('click', function (d) {
             console.log('click line: d');
             console.log(d);         // the food item {item, calories, etc}
+            d3.select('#item').text(d.Item + ' - (' + d.Category + ')');            // shows name of selected item
             generatePieChart(d);
         })
         .on("mouseover", highlight)
@@ -178,32 +179,31 @@ d3.csv("starbucksfoods.csv", function (csv) {
         .innerRadius(0)
         .outerRadius(radius);
 
-    // shape helper to build arcs:
-    var arcGenerator = d3.arc()
-        .innerRadius(0)
-        .outerRadius(radius)
-
     // --- pie initialization (end) ---
 
     // function to create the pie chart of the % make-up of calories per macronutrient
     function generatePieChart(data) {
 
+        // console.log(data);
 
-        console.log(data);
+        d3.select('#totalCalories').text(data.Calories);
 
         var dataSet = [data.Fat, data.Carb, data.Fiber, data.Protein]
 
         // calculate # of calories each macronutrient contributes in total
         var calorieSet = dataSet.map((elem, i) => calories[i] * elem)
 
-        // logCheckCalories(calorieSet, data.Calories);
+        // finds % contribution to calories from each macronutrient
+        var calorieSum = sumCalories(calorieSet);
+        var percentage = calorieSet.map((e) => Math.round((e / calorieSum) * 100));
+
 
 
         // delete previous arcs (elements w/ class 'arc')
         pieChart.selectAll(".arc").remove();
 
         //Generate groups
-        var arcs = g.selectAll("arc")
+        var arcs = g.selectAll("arc")       // g.slice or arc ?
             .data(pie(calorieSet))
             .enter()
             .append("g")
@@ -212,7 +212,7 @@ d3.csv("starbucksfoods.csv", function (csv) {
         //Draw arc paths
         arcs.append("path")
             .attr("fill", function (d, i) {
-                console.log('COLOR')
+                console.log('COLOR');
                 return pieChartColors(i);
             })
             .attr("d", arc)
@@ -220,16 +220,45 @@ d3.csv("starbucksfoods.csv", function (csv) {
             .attr("stroke", "white")
             .style("stroke-width", "2px")
 
+        // draw label
+        arcs.append("text")
+            .attr("transform", function (d) {
+                // console.log(d);
+                // d.innerRadius = 0;
+                // d.outerRadius = 5;
+                return "translate(" + arc.centroid(d) + ")";
+            })
+            .attr("text-anchor", "middle")
+            .text(function (d, i) {
+                console.log(i);
+                console.log(d);
+                if (!d.data) return;
+                // hacky workaround
+                var nutrients = ['Fat', 'Carb', 'Fiber', 'Protein'];
+                return nutrients[i] + ': ' + percentage[i] + '%';
+            }
+            );
+
+        pieChart
+            .append("text")
+            .attr("x", (width / 2))
+            .attr("y", 0 - (margin.top / 2))
+            .attr("text-anchor", "middle")
+            .style("font-size", "16px")
+            .style("text-decoration", "underline")
+            .text("Value vs Date Graph");
+
 
     } // generatePieChart
 
 });
 
-function logCheckCalories(calSet, totalCal) {
+function sumCalories(calSet, totalCal = 'N/A') {
     // logging function, unecessary for functionality
     // just checking if calories calculated = total calories listed
     var sum = calSet.reduce(function (a, b) {
         return a + b;
     }, 0);
-    console.log('SUM: ' + sum + ' | total calories: ' + totalCal);
+    // console.log('SUM: ' + sum + ' | total calories: ' + totalCal);
+    return sum;
 }

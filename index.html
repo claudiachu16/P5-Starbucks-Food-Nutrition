@@ -1,39 +1,45 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="UTF-8"/> 
-		<title>P5 Starbucks Food Nutrition</title>
-		<link href="style.css" type="text/css" rel="stylesheet" />
-		<script src="https://d3js.org/d3.v4.min.js"></script>
-		<script type="text/javascript" src="main.js"></script>	 
-   	</head>
-   	<body>
-   		<h4>P5 Starbucks Food Nutrition</h4>
 
-		<select id="categorySelect">
-			<option value="" disabled selected>Select Category</option>
-			<option value="All">All</option>
-			<option value="Bagels">Bagels</option>
-			<option value="Bars">Bars</option>
-			<option value="Bowls">Bowls</option>
-			<option value="Breakfasts">Breakfasts</option>
-			<option value="Cake Pops">Cake Pops</option>
-			<option value="Cookies">Cookies</option>
-			<option value="Croissants">Croissants</option>
-			<option value="Desserts">Desserts</option>
-			<option value="Muffins & Breads">Muffins & Breads</option>
-			<option value="Protein Boxes">Protein Boxes</option>
-			<option value="Scones">Scones</option>
-			<option value="Salads">Salads</option>
-			<option value="Sandwiches">Sandwiches</option>
-			<option value="Snacks">Snacks</option>
-			<option value="Yogurts">Yogurts</option>
-		</select>
+<head>
+	<meta charset="UTF-8" />
+	<title>P5 Starbucks Food Nutrition</title>
+	<link href="style.css" type="text/css" rel="stylesheet" />
+	<script src="https://d3js.org/d3.v4.min.js"></script>
+	<script type="text/javascript" src="main.js"></script>
+</head>
 
-		<button id="button">Filter Data</button>
+<body>
+	<h4>P5 Starbucks Food Nutrition</h4>
 
-		<div id="pcp"></div>
+	<select id="categorySelect">
+		<option value="" disabled selected>Select Category</option>
+		<option value="All">All</option>
+		<option value="Bagels">Bagels</option>
+		<option value="Bars">Bars</option>
+		<option value="Bowls">Bowls</option>
+		<option value="Breakfasts">Breakfasts</option>
+		<option value="Cake Pops">Cake Pops</option>
+		<option value="Cookies">Cookies</option>
+		<option value="Croissants">Croissants</option>
+		<option value="Desserts">Desserts</option>
+		<option value="Muffins & Breads">Muffins & Breads</option>
+		<option value="Protein Boxes">Protein Boxes</option>
+		<option value="Scones">Scones</option>
+		<option value="Salads">Salads</option>
+		<option value="Sandwiches">Sandwiches</option>
+		<option value="Snacks">Snacks</option>
+		<option value="Yogurts">Yogurts</option>
+	</select>
 
-		<div id="pieChart"></div>
-	</body>
+	<button id="button">Filter Data</button>
+
+	<div id="pcp" class="left-element"></div>
+	<strong>Selected Item:</strong> <span id="item"></span>
+	<div id="pieChart" class="right-element">
+		<p>% Contribution to Calories from Macronutrients</p>
+		<p>Total Calories: <span id="totalCalories"></span></p>
+	</div>
+</body>
+
 </html>
