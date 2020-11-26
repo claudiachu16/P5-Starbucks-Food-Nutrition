@@ -157,6 +157,12 @@ d3.csv("starbucksfoods.csv", function (csv) {
                 .attr('visibility', 'hidden');
         });
 
+    // set up pie chart variables so generatePieChart function updates these
+    var pieChart = d3.select("#pieChart")
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
+    var g = pieChart.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
     //creates the pie chart of the % make-up of calories per macronutrient
     function generatePieChart(data) {
@@ -170,12 +176,12 @@ d3.csv("starbucksfoods.csv", function (csv) {
 
         calorieSet = dataSet.map((elem, i) => calories[i] * elem)
         console.log(calorieSet)
-        var pieChart = d3.select("#pieChart")
+        pieChart = d3.select("#pieChart")
             .append("svg")
             .attr("width", width)
             .attr("height", height);
 
-        g = pieChart.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+        // g = pieChart.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
         // Generate the pie
         var pie = d3.pie();
 
