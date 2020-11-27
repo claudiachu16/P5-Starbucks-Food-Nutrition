@@ -3,6 +3,8 @@ var height = 800;
 const radius = 200
 const calories = [9, 4, 0, 4];        // # calories each macronutrient provides
 const pieChartColors = d3.scaleOrdinal(['gold', 'blueviolet', 'green', 'darksalmon'])   // fat, carb, fiber, protein
+const MIN = 'min';
+const MAX = 'max';
 
 d3.csv("starbucksfoods.csv", function (csv) {
 
@@ -129,36 +131,39 @@ d3.csv("starbucksfoods.csv", function (csv) {
             //name of selected category
             // console.log('FILTER CLICKED: ' + d3.select("#categorySelect").property("value"));
 
-            var selectValue = d3.select("#categorySelect").property("value");
+            applyFilters();
 
-            // show all lines
-            if (selectValue == 'All' || selectValue == null || selectValue == '') {
-                console.log('ALL SELECTED');
-                d3.selectAll('.lines')
-                    .transition().duration(200)
-                    .attr('visibility', 'visible');
-                return;
-            }
+            // var selectValue = d3.select("#categorySelect").property("value");
 
-            // get lines beloning to selected category
-            var selected = d3.selectAll('.lines')
-                .filter(function (d) {
-                    // console.log(d);
-                    return d.Category == selectValue;
-                });
-            // get lines not belonging to selected category
-            var notSelected = d3.selectAll('.lines')
-                .filter(function (d) {
-                    // console.log(d);
-                    return d.Category != selectValue;
-                });
-            // make selected / notSelected visible / not visible
-            selected
-                .transition().duration(200)
-                .attr('visibility', 'visible');
-            notSelected
-                .transition().duration(200)
-                .attr('visibility', 'hidden');
+            // // show all lines
+            // if (selectValue == 'All' || selectValue == null || selectValue == '') {
+            //     console.log('ALL SELECTED');
+            //     d3.selectAll('.lines')
+            //         .transition().duration(200)
+            //         .attr('visibility', 'visible');
+
+            //     return;
+            // }
+
+            // // get lines beloning to selected category
+            // var selected = d3.selectAll('.lines')
+            //     .filter(function (d) {
+            //         // console.log(d);
+            //         return d.Category == selectValue;
+            //     });
+            // // get lines not belonging to selected category
+            // var notSelected = d3.selectAll('.lines')
+            //     .filter(function (d) {
+            //         // console.log(d);
+            //         return d.Category != selectValue;
+            //     });
+            // // make selected / notSelected visible / not visible
+            // selected
+            //     .transition().duration(200)
+            //     .attr('visibility', 'visible');
+            // notSelected
+            //     .transition().duration(200)
+            //     .attr('visibility', 'hidden');
         });
 
 
@@ -251,6 +256,26 @@ d3.csv("starbucksfoods.csv", function (csv) {
 
     } // generatePieChart
 
+    // --- SLIDERS (dont know how to do min and max sliders) ---
+
+    d3.select("#caloriesMax").on("input", function () {
+        applyFilters();
+    });
+    d3.select("#fatMax").on("input", function () {
+        applyFilters();
+    });
+    d3.select("#carbMax").on("input", function () {
+        applyFilters();
+    });
+    d3.select("#fiberMax").on("input", function () {
+        applyFilters();
+    });
+    d3.select("#proteinMax").on("input", function () {
+        applyFilters();
+    });
+
+    // --- sliders (end) ---
+
 });
 
 function sumCalories(calSet, totalCal = 'N/A') {
@@ -262,3 +287,62 @@ function sumCalories(calSet, totalCal = 'N/A') {
     // console.log('SUM: ' + sum + ' | total calories: ' + totalCal);
     return sum;
 }
+
+function applyFilters() {
+
+    // gets the value of category selection
+    var selectValue = d3.select("#categorySelect").property("value");
+
+    // gets the current value (to use as max filter) of the sliders
+    var calorieMax = d3.select('#caloriesMax').property('value');
+    var fatMax = d3.select('#fatMax').property('value');
+    var carbMax = d3.select('#carbMax').property('value');
+    var fiberMax = d3.select('#fiberMax').property('value');
+    var proteinMax = d3.select('#proteinMax').property('value');
+
+    // get lines belonging to selected category + slider filters
+    var passFilter = d3.selectAll('.lines')
+        .filter(function (d) {
+            // checks if item belongs to selected category
+            var isSelected = d.Category == selectValue;
+            // if selection is all, everything counts as selected
+            if (selectValue == 'All' || selectValue == null || selectValue == '') { isSelected = true };
+            // checks if any of items values lie below slider value
+            var isBelowMax = (+d.Calories <= +calorieMax
+                && +d.Fat <= +fatMax
+                && +d.Carb <= +carbMax
+                && +d.Fiber <= +fiberMax
+                && +d.Protein <= +proteinMax);
+            // returns true if element passes all filters
+            return isSelected && isBelowMax;
+        });
+    // get lines not belonging to selected category + slider filters
+    // reverse of selected
+    var failFilter = d3.selectAll('.lines')
+        .filter(function (d) {
+            var isSelected = d.Category == selectValue;
+            if (selectValue == 'All' || selectValue == null || selectValue == '') { isSelected = true };
+            var isBelowMax = (+d.Calories <= +calorieMax
+                && +d.Fat <= +fatMax
+                && +d.Carb <= +carbMax
+                && +d.Fiber <= +fiberMax
+                && +d.Protein <= +proteinMax);
+            // returns false for elements that pass filters and true for elements that do not pass filters
+            return !(isSelected && isBelowMax);
+        });
+    // make selected / notSelected visible / not visible
+    passFilter
+        .attr('visibility', 'visible');
+    failFilter
+        .attr('visibility', 'hidden');
+
+    // might be used for max + min sliders
+    // var aboveVis = 'visible';
+    // var belowVis = 'hidden';
+    // if (threshold != MIN && threshold != MAX) throw "threshold value must be of const MIN or MAX in updateChart()";
+    // if (threshold === MAX) {
+    //     aboveVis = 'hidden';
+    //     belowVis = 'visible';
+    // }
+
+} // applyFilters()
