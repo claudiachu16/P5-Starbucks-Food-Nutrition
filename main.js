@@ -96,8 +96,6 @@ d3.csv("starbucksfoods.csv", function (csv) {
         .style("stroke", "#00704A")
         .style("opacity", 0.6)
         .on('click', function (d) {
-            console.log('click line: d');
-            console.log(d);         // the food item {item, calories, etc}
             d3.select('#item').text(d.Item + ' - (' + d.Category + ')');            // shows name of selected item
             generatePieChart(d);
         })
@@ -128,42 +126,7 @@ d3.csv("starbucksfoods.csv", function (csv) {
         .text('Filter Data')
         //only displays the lines for the selected category
         .on('click', function () {
-            //name of selected category
-            // console.log('FILTER CLICKED: ' + d3.select("#categorySelect").property("value"));
-
             applyFilters();
-
-            // var selectValue = d3.select("#categorySelect").property("value");
-
-            // // show all lines
-            // if (selectValue == 'All' || selectValue == null || selectValue == '') {
-            //     console.log('ALL SELECTED');
-            //     d3.selectAll('.lines')
-            //         .transition().duration(200)
-            //         .attr('visibility', 'visible');
-
-            //     return;
-            // }
-
-            // // get lines beloning to selected category
-            // var selected = d3.selectAll('.lines')
-            //     .filter(function (d) {
-            //         // console.log(d);
-            //         return d.Category == selectValue;
-            //     });
-            // // get lines not belonging to selected category
-            // var notSelected = d3.selectAll('.lines')
-            //     .filter(function (d) {
-            //         // console.log(d);
-            //         return d.Category != selectValue;
-            //     });
-            // // make selected / notSelected visible / not visible
-            // selected
-            //     .transition().duration(200)
-            //     .attr('visibility', 'visible');
-            // notSelected
-            //     .transition().duration(200)
-            //     .attr('visibility', 'hidden');
         });
 
 
@@ -188,8 +151,6 @@ d3.csv("starbucksfoods.csv", function (csv) {
 
     // function to create the pie chart of the % make-up of calories per macronutrient
     function generatePieChart(data) {
-
-        // console.log(data);
 
         d3.select('#totalCalories').text(data.Calories);
 
@@ -217,7 +178,6 @@ d3.csv("starbucksfoods.csv", function (csv) {
         //Draw arc paths
         arcs.append("path")
             .attr("fill", function (d, i) {
-                console.log('COLOR');
                 return pieChartColors(i);
             })
             .attr("d", arc)
@@ -228,15 +188,13 @@ d3.csv("starbucksfoods.csv", function (csv) {
         // draw label
         arcs.append("text")
             .attr("transform", function (d) {
-                // console.log(d);
+                // dont know if necessary
                 // d.innerRadius = 0;
                 // d.outerRadius = 5;
                 return "translate(" + arc.centroid(d) + ")";
             })
             .attr("text-anchor", "middle")
             .text(function (d, i) {
-                console.log(i);
-                console.log(d);
                 if (!d.data) return;
                 // hacky workaround
                 var nutrients = ['Fat', 'Carb', 'Fiber', 'Protein'];
@@ -260,18 +218,30 @@ d3.csv("starbucksfoods.csv", function (csv) {
 
     d3.select("#caloriesMax").on("input", function () {
         applyFilters();
+        // adjust the text on the range slider
+        d3.select("#caloriesMax-value").text(+this.value);
+        d3.select("#caloriesMax").property("value", +this.value);
     });
     d3.select("#fatMax").on("input", function () {
         applyFilters();
+        d3.select("#fatMax-value").text(+this.value);
+        d3.select("#fatMax").property("value", +this.value);
     });
     d3.select("#carbMax").on("input", function () {
         applyFilters();
+        d3.select("#carbMax-value").text(+this.value);
+        d3.select("#carbMax").property("value", +this.value);
     });
     d3.select("#fiberMax").on("input", function () {
         applyFilters();
+        // adjust the text on the range slider
+        d3.select("#fiberMax-value").text(+this.value);
+        d3.select("#fiberMax").property("value", +this.value);
     });
     d3.select("#proteinMax").on("input", function () {
         applyFilters();
+        d3.select("#proteinMax-value").text(+this.value);
+        d3.select("#proteinMax").property("value", +this.value);
     });
 
     // --- sliders (end) ---
@@ -279,8 +249,8 @@ d3.csv("starbucksfoods.csv", function (csv) {
 });
 
 function sumCalories(calSet, totalCal = 'N/A') {
-    // logging function, unecessary for functionality
-    // just checking if calories calculated = total calories listed
+    // uncomment log to check if calories calculated = total calories listed
+    // calorie calculation for some items are off +/- 10 calories
     var sum = calSet.reduce(function (a, b) {
         return a + b;
     }, 0);
