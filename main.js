@@ -1,6 +1,6 @@
 var width = 1500;
 var height = 800;
-const radius = 200
+const radius = 200;
 const calories = [9, 4, 0, 4];        // # calories each macronutrient provides
 const pieChartColors = d3.scaleOrdinal(['gold', 'blueviolet', 'green', 'darksalmon'])   // fat, carb, fiber, protein
 const MIN = 'min';
@@ -133,11 +133,13 @@ d3.csv("starbucksfoods.csv", function (csv) {
     // --- PIE INITIALIZATION (start) ---
 
     // set up pie chart variables so generatePieChart function updates these
+    var pieWidth = 400;
+    var pieHeight = 400;
     var pieChart = d3.select("#pieChart")
         .append("svg")
-        .attr("width", width)
-        .attr("height", height);
-    var g = pieChart.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+        .attr("width", pieWidth)
+        .attr("height", pieHeight);
+    var g = pieChart.append("g").attr("transform", "translate(" + pieWidth / 2 + "," + pieHeight / 2 + ")");
 
     // Generate the pie
     var pie = d3.pie();
@@ -162,8 +164,6 @@ d3.csv("starbucksfoods.csv", function (csv) {
         // finds % contribution to calories from each macronutrient
         var calorieSum = sumCalories(calorieSet);
         var percentage = calorieSet.map((e) => Math.round((e / calorieSum) * 100));
-
-
 
         // delete previous arcs (elements w/ class 'arc')
         pieChart.selectAll(".arc").remove();
@@ -214,8 +214,137 @@ d3.csv("starbucksfoods.csv", function (csv) {
 
     } // generatePieChart
 
-    // --- SLIDERS (dont know how to do min and max sliders) ---
+    // --- SLIDERS ---
 
+    initSliders()
+    // reset slider min/max button reset
+    d3.select("#resetSliders")
+        .style("border", "3px solid crimson")
+        .on('click', function () {
+            resetSliders();
+            applyFilters();
+        });
+
+    // --- sliders (end) ---
+
+});
+
+function sumCalories(calSet, totalCal = 'N/A') {
+    // uncomment log to check if calories calculated = total calories listed
+    // calorie calculation for some items are off +/- 10 calories
+    var sum = calSet.reduce(function (a, b) {
+        return a + b;
+    }, 0);
+    // console.log('SUM: ' + sum + ' | total calories: ' + totalCal);
+    return sum;
+}
+
+/**
+ * Applies filters by selecting all lines in the PCP
+ * that pass each filter condition
+ * ex: filter conditions: isSelected, isBelowMax, isAboveMin
+ */
+function applyFilters() {
+
+    // gets the value of category selection
+    var selectValue = d3.select("#categorySelect").property("value");
+
+    // get lines belonging to selected category + slider filters
+    var passFilter = d3.selectAll('.lines')
+        .filter(function (d) {
+            // checks if item belongs to selected category
+            var isSelected = d.Category == selectValue;
+            // if selection is all, everything counts as selected
+            if (selectValue == 'All' || selectValue == null || selectValue == '') { isSelected = true };
+            // checks if any of items values lie below slider value
+            var isBelowMax = checkIfBelowMax(d);
+            var isAboveMin = checkIfAboveMin(d);
+            // returns true if element passes all filters
+            return isSelected && isBelowMax && isAboveMin;
+        });
+    // get lines not belonging to selected category + slider filters
+    // reverse of selected
+    var failFilter = d3.selectAll('.lines')
+        .filter(function (d) {
+            var isSelected = d.Category == selectValue;
+            if (selectValue == 'All' || selectValue == null || selectValue == '') { isSelected = true };
+            var isBelowMax = checkIfBelowMax(d);
+            var isAboveMin = checkIfAboveMin(d);
+            // returns false for elements that pass filters and true for elements that do not pass filters
+            return !(isSelected && isBelowMax && isAboveMin);
+        });
+    // make elements that pass/fail the filter visible/hidden
+    passFilter
+        .attr('visibility', 'visible');
+    failFilter
+        .attr('visibility', 'hidden');
+
+} // applyFilters()
+
+
+/**
+ * Checks if an item has all its property values below
+ * the max of the slider value for those properties
+ * @param {some item w/ Calories, Fat, Category, etc} d 
+ */
+function checkIfBelowMax(d) {
+    // gets the current value (to use as max filter) of the sliders
+    var calorieMax = d3.select('#caloriesMax').property('value');
+    var fatMax = d3.select('#fatMax').property('value');
+    var carbMax = d3.select('#carbMax').property('value');
+    var fiberMax = d3.select('#fiberMax').property('value');
+    var proteinMax = d3.select('#proteinMax').property('value');
+    var isBelowMax = (+d.Calories <= +calorieMax
+        && +d.Fat <= +fatMax
+        && +d.Carb <= +carbMax
+        && +d.Fiber <= +fiberMax
+        && +d.Protein <= +proteinMax);
+    return isBelowMax;
+}
+
+/**
+ * Checks if an item has all its property values above
+ * the min of the slider value for those properties
+ * @param {some item w/ Calories, Fat, Category, etc} d 
+ */
+function checkIfAboveMin(d) {
+    // gets the current value (to use as min filter) of the sliders
+    var calorieMin = d3.select('#caloriesMin').property('value');
+    var fatMin = d3.select('#fatMin').property('value');
+    var carbMin = d3.select('#carbMin').property('value');
+    var fiberMin = d3.select('#fiberMin').property('value');
+    var proteinMin = d3.select('#proteinMin').property('value');
+    var isAboveMin = (+d.Calories >= +calorieMin
+        && +d.Fat >= +fatMin
+        && +d.Carb >= +carbMin
+        && +d.Fiber >= +fiberMin
+        && +d.Protein >= +proteinMin);
+    return isAboveMin;
+}
+
+/**
+ * Initializes sliders so value and label change when sliding
+ * also calls apply filters whenever value changes
+ */
+function initSliders() {
+
+    /**
+     * Trying to select all slider inputs + labels 
+     * to set up value + label change in one go
+     * to reduce large chunk of code below
+     * Not sure how to do this
+     */
+
+    // var minSlidersLabel = d3.select('#minSliders')
+    //     .selectAll('label');
+    // var minSliders = d3.select('#minSliders')
+    //     .selectAll('input', function () {
+    //         applyFilters();
+    //         minSlidersLabel.text(+this.value);
+    //         minSliders.property('value', +this.value);
+    //     });
+
+    // max sliders
     d3.select("#caloriesMax").on("input", function () {
         applyFilters();
         // adjust the text on the range slider
@@ -244,75 +373,51 @@ d3.csv("starbucksfoods.csv", function (csv) {
         d3.select("#proteinMax").property("value", +this.value);
     });
 
-    // --- sliders (end) ---
+    // min sliders
+    d3.select("#caloriesMin").on("input", function () {
+        applyFilters();
+        // adjust the text on the range slider
+        d3.select("#caloriesMin-value").text(+this.value);
+        d3.select("#caloriesMin").property("value", +this.value);
+    });
+    d3.select("#fatMin").on("input", function () {
+        applyFilters();
+        d3.select("#fatMin-value").text(+this.value);
+        d3.select("#fatMin").property("value", +this.value);
+    });
+    d3.select("#carbMin").on("input", function () {
+        applyFilters();
+        d3.select("#carbMin-value").text(+this.value);
+        d3.select("#carbMin").property("value", +this.value);
+    });
+    d3.select("#fiberMin").on("input", function () {
+        applyFilters();
+        // adjust the text on the range slider
+        d3.select("#fiberMin-value").text(+this.value);
+        d3.select("#fiberMin").property("value", +this.value);
+    });
+    d3.select("#proteinMin").on("input", function () {
+        applyFilters();
+        d3.select("#proteinMin-value").text(+this.value);
+        d3.select("#proteinMin").property("value", +this.value);
+    });
+} // initSliders
 
-});
-
-function sumCalories(calSet, totalCal = 'N/A') {
-    // uncomment log to check if calories calculated = total calories listed
-    // calorie calculation for some items are off +/- 10 calories
-    var sum = calSet.reduce(function (a, b) {
-        return a + b;
-    }, 0);
-    // console.log('SUM: ' + sum + ' | total calories: ' + totalCal);
-    return sum;
+/**
+ * Resets sliders
+ * max + min values currently hardcoded
+ */
+function resetSliders() {
+    // max sliders
+    d3.select('#caloriesMax').property('value', 650);
+    d3.select('#fatMax').property('value', 40);
+    d3.select('#carbMax').property('value', 80);
+    d3.select('#fiberMax').property('value', 25);
+    d3.select('#proteinMax').property('value', 35);
+    // min sliders
+    d3.select('#caloriesMin').property('value', 0);
+    d3.select('#fatMin').property('value', 0);
+    d3.select('#carbMin').property('value', 0);
+    d3.select('#fiberMin').property('value', 0);
+    d3.select('#proteinMin').property('value', 0);
 }
-
-function applyFilters() {
-
-    // gets the value of category selection
-    var selectValue = d3.select("#categorySelect").property("value");
-
-    // gets the current value (to use as max filter) of the sliders
-    var calorieMax = d3.select('#caloriesMax').property('value');
-    var fatMax = d3.select('#fatMax').property('value');
-    var carbMax = d3.select('#carbMax').property('value');
-    var fiberMax = d3.select('#fiberMax').property('value');
-    var proteinMax = d3.select('#proteinMax').property('value');
-
-    // get lines belonging to selected category + slider filters
-    var passFilter = d3.selectAll('.lines')
-        .filter(function (d) {
-            // checks if item belongs to selected category
-            var isSelected = d.Category == selectValue;
-            // if selection is all, everything counts as selected
-            if (selectValue == 'All' || selectValue == null || selectValue == '') { isSelected = true };
-            // checks if any of items values lie below slider value
-            var isBelowMax = (+d.Calories <= +calorieMax
-                && +d.Fat <= +fatMax
-                && +d.Carb <= +carbMax
-                && +d.Fiber <= +fiberMax
-                && +d.Protein <= +proteinMax);
-            // returns true if element passes all filters
-            return isSelected && isBelowMax;
-        });
-    // get lines not belonging to selected category + slider filters
-    // reverse of selected
-    var failFilter = d3.selectAll('.lines')
-        .filter(function (d) {
-            var isSelected = d.Category == selectValue;
-            if (selectValue == 'All' || selectValue == null || selectValue == '') { isSelected = true };
-            var isBelowMax = (+d.Calories <= +calorieMax
-                && +d.Fat <= +fatMax
-                && +d.Carb <= +carbMax
-                && +d.Fiber <= +fiberMax
-                && +d.Protein <= +proteinMax);
-            // returns false for elements that pass filters and true for elements that do not pass filters
-            return !(isSelected && isBelowMax);
-        });
-    // make selected / notSelected visible / not visible
-    passFilter
-        .attr('visibility', 'visible');
-    failFilter
-        .attr('visibility', 'hidden');
-
-    // might be used for max + min sliders
-    // var aboveVis = 'visible';
-    // var belowVis = 'hidden';
-    // if (threshold != MIN && threshold != MAX) throw "threshold value must be of const MIN or MAX in updateChart()";
-    // if (threshold === MAX) {
-    //     aboveVis = 'hidden';
-    //     belowVis = 'visible';
-    // }
-
-} // applyFilters()

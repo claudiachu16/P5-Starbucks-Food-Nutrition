@@ -34,7 +34,7 @@
 
 	<button id="button">Filter Data</button>
 
-	<div class="flex-container">
+	<div class="flex-container" id="maxSliders">
 		<p>
 			<label for="caloriesMax" style="display: inline-block; width: 240px; text-align: left">
 				Calories Max = <span id="caloriesMax-value">…</span>
@@ -68,25 +68,57 @@
 			</label>
 			<input type="range" min="0" max="35" id="proteinMax" value="35">
 		</p>
+		<button id="resetSliders">Reset Sliders</button>
 	</div>
 
-	<!-- <div id='minSliders' class="flex-container">
+	<div class="flex-container" id="minSliders">
 		<p>
-			<label for="caloriesMin">
+			<label for="caloriesMin" style="display: inline-block; width: 240px; text-align: left">
 				Calories Min = <span id="caloriesMin-value">…</span>
 			</label>
 			<input type="range" min="0" max="650" id="caloriesMin" value="0">
 		</p>
-
-	</div> -->
-
-
-	<div id="pcp" class="left-element"></div>
-	<strong>Selected Item:</strong> <span id="item"></span>
-	<div id="pieChart" class="right-element">
-		<p>% Contribution to Calories from Macronutrients</p>
-		<p>Total Calories: <span id="totalCalories"></span></p>
+		<p>
+			<label for="fatMin">
+				Fat Min = <span id="fatMin-value" style="display: inline-block; width: 240px; text-align: left">…</span>
+			</label>
+			<input type="range" min="0" max="40" id="fatMin" value="0">
+		</p>
+		<p>
+			<label for="carbMin">
+				Carb Min = <span id="carbMin-value"
+					style="display: inline-block; width: 240px; text-align: left">…</span>
+			</label>
+			<input type="range" min="0" max="80" id="carbMin" value="0">
+		</p>
+		<p>
+			<label for="fiberMin">
+				Fiber Min = <span id="fiberMin-value"
+					style="display: inline-block; width: 240px; text-align: left">…</span>
+			</label>
+			<input type="range" min="0" max="25" id="fiberMin" value="0">
+		</p>
+		<p>
+			<label for="proteinMin">
+				Protein Min = <span id="proteinMin-value"
+					style="display: inline-block; width: 240px; text-align: left">…</span>
+			</label>
+			<input type="range" min="0" max="35" id="proteinMin" value="0">
+		</p>
 	</div>
+
+	<div id="chartHolder" class="flex-container">
+		<div id="pcp" class="left-element"></div>
+		<div>
+			<strong>Selected Item:</strong> <span id="item"></span>
+			<div id="pieChart" class="right-element">
+				<p>% Contribution to Calories from Macronutrients</p>
+				<p>Total Calories: <span id="totalCalories"></span></p>
+			</div>
+		</div>
+	</div>
+
+
 </body>
 
 </html>
