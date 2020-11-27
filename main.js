@@ -121,13 +121,15 @@ d3.csv("starbucksfoods.csv", function (csv) {
 
 
     //'Filter Data' button and its functionalities
-    d3.select("#button")
-        .style("border", "1px solid black")
-        .text('Filter Data')
-        //only displays the lines for the selected category
-        .on('click', function () {
-            applyFilters();
-        });
+    // d3.select("#button")
+    //     .style("border", "1px solid black")
+    //     .text('Filter Data')
+    //     //only displays the lines for the selected category
+    //     .on('click', applyFilters);
+
+    // filters data when selection changes (no need to click 'Apply Filters' button)
+    d3.select("#categorySelect")
+        .on('change', applyFilters);
 
 
     // --- PIE INITIALIZATION (start) ---
