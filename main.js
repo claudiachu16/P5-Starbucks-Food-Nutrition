@@ -1,22 +1,25 @@
-var width = 1500;
-var height = 800;
+let width = 1500;
+let height = 800;
 const radius = 200;
 const calories = [9, 4, 0, 4];        // # calories each macronutrient provides
 const pieChartColors = d3.scaleOrdinal(['gold', 'blueviolet', 'green', 'darksalmon'])   // fat, carb, fiber, protein
 const MIN = 'min';
 const MAX = 'max';
+const STROKE_MULT = 1.5;
+const UNHIGLIGHT_OPACITY = 0.6;
+let curStrokeWidth = 1;
 
 d3.csv("starbucksfoods.csv", function (csv) {
 
 
     //margin values to format PCP within div
-    var margin = { top: 30, right: 10, bottom: 10, left: 0 },
+    let margin = { top: 30, right: 10, bottom: 10, left: 0 },
         width = 1500 - margin.left - margin.right,
         height = 800 - margin.top - margin.bottom;
 
 
     //PCP graph
-    var graph = d3.select("#pcp").append("svg")
+    let graph = d3.select("#pcp").append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
@@ -24,15 +27,15 @@ d3.csv("starbucksfoods.csv", function (csv) {
 
 
     //get the 5 axes values (Calories, Fat, Carb, Fiber Protein)
-    var dimensions = d3.keys(csv[0]).filter(function (d) {
+    let dimensions = d3.keys(csv[0]).filter(function (d) {
         return (d != "Item" && d != "Category");
     });
 
 
     //for each dimension, build a linear scale and store in y
-    var y = {};
+    let y = {};
     for (i in dimensions) {
-        var dimName = dimensions[i];
+        let dimName = dimensions[i];
         y[dimName] = d3.scaleLinear()
             .domain(d3.extent(csv, function (d) { return +d[dimName]; }))
             .range([height, 0])
@@ -40,7 +43,7 @@ d3.csv("starbucksfoods.csv", function (csv) {
 
 
     //build "x" scale by distributing the y-axes in equal intervals across width
-    var x = d3.scalePoint()
+    let x = d3.scalePoint()
         .range([0, width])
         .padding(1)
         .domain(dimensions);
@@ -55,7 +58,7 @@ d3.csv("starbucksfoods.csv", function (csv) {
 
 
     //color mappings for each of the categories
-    var color = d3.scaleOrdinal()
+    let color = d3.scaleOrdinal()
         .domain(["Bagels", "Bars", "Bowls", "Breakfasts", "Cake Pops", "Cookies", "Croissants", "Desserts",
             "Muffins & Breads", "Protein Boxes", "Scones", "Salads", "Sandwiches", "Snacks", "Yogurts"])
         .range(["#000000", "#090979", "#003f5c", "#2f4b7c", "#665191", "#a05195", "#d45087", "#f95d6a", "#ff7c43", "#ffa600",
@@ -63,24 +66,27 @@ d3.csv("starbucksfoods.csv", function (csv) {
 
 
     //highlights hovered lines/paths
-    var highlight = function (d) {
+    let highlight = function (d) {
         //select the line being hovered and change styling
         d3.select(this)
             .transition().duration(200)
             //color is chosen according to mapping above ****NOTE too many colors?
             .style("stroke", color(d.Category))
-            .style("stroke-width", 4)
+            .style("stroke-width", Math.max(4, STROKE_MULT * curStrokeWidth))
             .style("opacity", "1");
+        // create pie chart if hover is checked
+        let createPie = d3.select('#createPie').property("checked");
+        if (createPie) { generatePieChart(d) };
     };
 
 
     //un-highlights lines/paths and returns all to default
-    var unHighlight = function (d) {
+    let unHighlight = function (d) {
         d3.selectAll(".lines")
             .transition().duration(200).delay(200)
             .style("stroke", "#00704A")
-            .style("stroke-width", 1)
-            .style("opacity", 0.6);
+            .style("stroke-width", curStrokeWidth)
+            .style("opacity", UNHIGLIGHT_OPACITY);
     };
 
 
@@ -94,7 +100,7 @@ d3.csv("starbucksfoods.csv", function (csv) {
         .style("fill", "none")
         //color them all the same ***NOTE too many colors (15 for 15 categories)
         .style("stroke", "#00704A")
-        .style("opacity", 0.6)
+        .style("opacity", UNHIGLIGHT_OPACITY)
         .on('click', function (d) {
             d3.select('#item').text(d.Item + ' - (' + d.Category + ')');            // shows name of selected item
             generatePieChart(d);
@@ -135,19 +141,19 @@ d3.csv("starbucksfoods.csv", function (csv) {
     // --- PIE INITIALIZATION (start) ---
 
     // set up pie chart variables so generatePieChart function updates these
-    var pieWidth = 400;
-    var pieHeight = 400;
-    var pieChart = d3.select("#pieChart")
+    let pieWidth = 400;
+    let pieHeight = 400;
+    let pieChart = d3.select("#pieChart")
         .append("svg")
         .attr("width", pieWidth)
         .attr("height", pieHeight);
-    var g = pieChart.append("g").attr("transform", "translate(" + pieWidth / 2 + "," + pieHeight / 2 + ")");
+    let g = pieChart.append("g").attr("transform", "translate(" + pieWidth / 2 + "," + pieHeight / 2 + ")");
 
     // Generate the pie
-    var pie = d3.pie();
+    let pie = d3.pie();
 
     // Generate the arcs
-    var arc = d3.arc()
+    let arc = d3.arc()
         .innerRadius(0)
         .outerRadius(radius);
 
@@ -158,20 +164,20 @@ d3.csv("starbucksfoods.csv", function (csv) {
 
         d3.select('#totalCalories').text(data.Calories);
 
-        var dataSet = [data.Fat, data.Carb, data.Fiber, data.Protein]
+        let dataSet = [data.Fat, data.Carb, data.Fiber, data.Protein]
 
         // calculate # of calories each macronutrient contributes in total
-        var calorieSet = dataSet.map((elem, i) => calories[i] * elem)
+        let calorieSet = dataSet.map((elem, i) => calories[i] * elem)
 
         // finds % contribution to calories from each macronutrient
-        var calorieSum = sumCalories(calorieSet);
-        var percentage = calorieSet.map((e) => Math.round((e / calorieSum) * 100));
+        let calorieSum = sumCalories(calorieSet);
+        let percentage = calorieSet.map((e) => Math.round((e / calorieSum) * 100));
 
         // delete previous arcs (elements w/ class 'arc')
         pieChart.selectAll(".arc").remove();
 
         //Generate groups
-        var arcs = g.selectAll("arc")       // g.slice or arc ?
+        let arcs = g.selectAll("arc")       // g.slice or arc ?
             .data(pie(calorieSet))
             .enter()
             .append("g")
@@ -199,20 +205,10 @@ d3.csv("starbucksfoods.csv", function (csv) {
             .text(function (d, i) {
                 if (!d.data) return;
                 // hacky workaround
-                var nutrients = ['Fat', 'Carb', 'Fiber', 'Protein'];
+                let nutrients = ['Fat', 'Carb', 'Fiber', 'Protein'];
                 return nutrients[i] + ': ' + percentage[i] + '%';
             }
             );
-
-        pieChart
-            .append("text")
-            .attr("x", (width / 2))
-            .attr("y", 0 - (margin.top / 2))
-            .attr("text-anchor", "middle")
-            .style("font-size", "16px")
-            .style("text-decoration", "underline")
-            .text("Value vs Date Graph");
-
 
     } // generatePieChart
 
@@ -234,7 +230,7 @@ d3.csv("starbucksfoods.csv", function (csv) {
 function sumCalories(calSet, totalCal = 'N/A') {
     // uncomment log to check if calories calculated = total calories listed
     // calorie calculation for some items are off +/- 10 calories
-    var sum = calSet.reduce(function (a, b) {
+    let sum = calSet.reduce(function (a, b) {
         return a + b;
     }, 0);
     // console.log('SUM: ' + sum + ' | total calories: ' + totalCal);
@@ -249,35 +245,40 @@ function sumCalories(calSet, totalCal = 'N/A') {
 function applyFilters() {
 
     // gets the value of category selection
-    var selectValue = d3.select("#categorySelect").property("value");
+    let selectValue = d3.select("#categorySelect").property("value");
 
     // get lines belonging to selected category + slider filters
-    var passFilter = d3.selectAll('.lines')
+    let passFilter = d3.selectAll('.lines')
         .filter(function (d) {
             // checks if item belongs to selected category
-            var isSelected = d.Category == selectValue;
+            let isSelected = d.Category == selectValue;
             // if selection is all, everything counts as selected
             if (selectValue == 'All' || selectValue == null || selectValue == '') { isSelected = true };
             // checks if any of items values lie below slider value
-            var isBelowMax = checkIfBelowMax(d);
-            var isAboveMin = checkIfAboveMin(d);
+            let isBelowMax = checkIfBelowMax(d);
+            let isAboveMin = checkIfAboveMin(d);
             // returns true if element passes all filters
             return isSelected && isBelowMax && isAboveMin;
         });
     // get lines not belonging to selected category + slider filters
     // reverse of selected
-    var failFilter = d3.selectAll('.lines')
+    let failFilter = d3.selectAll('.lines')
         .filter(function (d) {
-            var isSelected = d.Category == selectValue;
+            let isSelected = d.Category == selectValue;
             if (selectValue == 'All' || selectValue == null || selectValue == '') { isSelected = true };
-            var isBelowMax = checkIfBelowMax(d);
-            var isAboveMin = checkIfAboveMin(d);
+            let isBelowMax = checkIfBelowMax(d);
+            let isAboveMin = checkIfAboveMin(d);
             // returns false for elements that pass filters and true for elements that do not pass filters
             return !(isSelected && isBelowMax && isAboveMin);
         });
+
+    // set stroke width based on num of visible lines
+    let numLines = passFilter._groups[0].length;
+    curStrokeWidth = getStrokeWidth(numLines);
     // make elements that pass/fail the filter visible/hidden
     passFilter
-        .attr('visibility', 'visible');
+        .attr('visibility', 'visible')
+        .style("stroke-width", curStrokeWidth);
     failFilter
         .attr('visibility', 'hidden');
 
@@ -291,12 +292,12 @@ function applyFilters() {
  */
 function checkIfBelowMax(d) {
     // gets the current value (to use as max filter) of the sliders
-    var calorieMax = d3.select('#caloriesMax').property('value');
-    var fatMax = d3.select('#fatMax').property('value');
-    var carbMax = d3.select('#carbMax').property('value');
-    var fiberMax = d3.select('#fiberMax').property('value');
-    var proteinMax = d3.select('#proteinMax').property('value');
-    var isBelowMax = (+d.Calories <= +calorieMax
+    let calorieMax = d3.select('#caloriesMax').property('value');
+    let fatMax = d3.select('#fatMax').property('value');
+    let carbMax = d3.select('#carbMax').property('value');
+    let fiberMax = d3.select('#fiberMax').property('value');
+    let proteinMax = d3.select('#proteinMax').property('value');
+    let isBelowMax = (+d.Calories <= +calorieMax
         && +d.Fat <= +fatMax
         && +d.Carb <= +carbMax
         && +d.Fiber <= +fiberMax
@@ -311,12 +312,12 @@ function checkIfBelowMax(d) {
  */
 function checkIfAboveMin(d) {
     // gets the current value (to use as min filter) of the sliders
-    var calorieMin = d3.select('#caloriesMin').property('value');
-    var fatMin = d3.select('#fatMin').property('value');
-    var carbMin = d3.select('#carbMin').property('value');
-    var fiberMin = d3.select('#fiberMin').property('value');
-    var proteinMin = d3.select('#proteinMin').property('value');
-    var isAboveMin = (+d.Calories >= +calorieMin
+    let calorieMin = d3.select('#caloriesMin').property('value');
+    let fatMin = d3.select('#fatMin').property('value');
+    let carbMin = d3.select('#carbMin').property('value');
+    let fiberMin = d3.select('#fiberMin').property('value');
+    let proteinMin = d3.select('#proteinMin').property('value');
+    let isAboveMin = (+d.Calories >= +calorieMin
         && +d.Fat >= +fatMin
         && +d.Carb >= +carbMin
         && +d.Fiber >= +fiberMin
@@ -337,9 +338,9 @@ function initSliders() {
      * Not sure how to do this
      */
 
-    // var minSlidersLabel = d3.select('#minSliders')
+    // let minSlidersLabel = d3.select('#minSliders')
     //     .selectAll('label');
-    // var minSliders = d3.select('#minSliders')
+    // let minSliders = d3.select('#minSliders')
     //     .selectAll('input', function () {
     //         applyFilters();
     //         minSlidersLabel.text(+this.value);
@@ -422,4 +423,8 @@ function resetSliders() {
     d3.select('#carbMin').property('value', 0);
     d3.select('#fiberMin').property('value', 0);
     d3.select('#proteinMin').property('value', 0);
+}
+
+function getStrokeWidth(numLines) {
+    return ((-0.3226 * numLines) + 46.5) / 10;
 }
