@@ -32,83 +32,94 @@
 		<option value="Yogurts">Yogurts</option>
 	</select>
 
-	<button id="button">Filter Data</button>
+	<button id="resetSliders">Reset Sliders</button>
+	<label class="switch">
+		Create Pie Chart on hover
+		<input id="createPie" type="checkbox">
+	</label>
 
 	<div class="flex-container" id="maxSliders">
 		<p>
 			<label for="caloriesMax" style="display: inline-block; width: 240px; text-align: left">
 				Calories Max = <span id="caloriesMax-value">…</span>
+				<input type="range" min="0" max="650" id="caloriesMax" value="650">
 			</label>
-			<input type="range" min="0" max="650" id="caloriesMax" value="650">
+			
 		</p>
 		<p>
-			<label for="fatMax">
+			<label for="fatMax" style="display: inline-block; width: 240px; text-align: left">
 				Fat Max = <span id="fatMax-value" style="display: inline-block; width: 240px; text-align: left">…</span>
+				<input type="range" min="0" max="40" id="fatMax" value="40">
 			</label>
-			<input type="range" min="0" max="40" id="fatMax" value="40">
+			
 		</p>
 		<p>
-			<label for="carbMax">
+			<label for="carbMax" style="display: inline-block; width: 240px; text-align: left">
 				Carb Max = <span id="carbMax-value"
 					style="display: inline-block; width: 240px; text-align: left">…</span>
+				<input type="range" min="0" max="80" id="carbMax" value="80">
 			</label>
-			<input type="range" min="0" max="80" id="carbMax" value="80">
+			
 		</p>
 		<p>
-			<label for="fiberMax">
+			<label for="fiberMax" style="display: inline-block; width: 240px; text-align: left">
 				Fiber Max = <span id="fiberMax-value"
 					style="display: inline-block; width: 240px; text-align: left">…</span>
+					<input type="range" min="0" max="25" id="fiberMax" value="25">
 			</label>
-			<input type="range" min="0" max="25" id="fiberMax" value="25">
+			
 		</p>
 		<p>
-			<label for="proteinMax">
+			<label for="proteinMax" style="display: inline-block; width: 240px; text-align: left">
 				Protein Max = <span id="proteinMax-value"
 					style="display: inline-block; width: 240px; text-align: left">…</span>
+					<input type="range" min="0" max="35" id="proteinMax" value="35">
 			</label>
-			<input type="range" min="0" max="35" id="proteinMax" value="35">
+			
 		</p>
-		<button id="resetSliders">Reset Sliders</button>
+		
 	</div>
 
 	<div class="flex-container" id="minSliders">
 		<p>
 			<label for="caloriesMin" style="display: inline-block; width: 240px; text-align: left">
 				Calories Min = <span id="caloriesMin-value">…</span>
+				<input type="range" min="0" max="650" id="caloriesMin" value="0">
 			</label>
-			<input type="range" min="0" max="650" id="caloriesMin" value="0">
+			
 		</p>
 		<p>
-			<label for="fatMin">
+			<label for="fatMin" style="display: inline-block; width: 240px; text-align: left">
 				Fat Min = <span id="fatMin-value" style="display: inline-block; width: 240px; text-align: left">…</span>
+				<input type="range" min="0" max="40" id="fatMin" value="0">
 			</label>
-			<input type="range" min="0" max="40" id="fatMin" value="0">
+			
 		</p>
 		<p>
-			<label for="carbMin">
+			<label for="carbMin" style="display: inline-block; width: 240px; text-align: left">
 				Carb Min = <span id="carbMin-value"
 					style="display: inline-block; width: 240px; text-align: left">…</span>
+					<input type="range" min="0" max="80" id="carbMin" value="0">
 			</label>
-			<input type="range" min="0" max="80" id="carbMin" value="0">
+			
 		</p>
 		<p>
-			<label for="fiberMin">
+			<label for="fiberMin" style="display: inline-block; width: 240px; text-align: left">
 				Fiber Min = <span id="fiberMin-value"
 					style="display: inline-block; width: 240px; text-align: left">…</span>
+					<input type="range" min="0" max="25" id="fiberMin" value="0">
 			</label>
-			<input type="range" min="0" max="25" id="fiberMin" value="0">
+			
 		</p>
 		<p>
-			<label for="proteinMin">
+			<label for="proteinMin" style="display: inline-block; width: 240px; text-align: left">
 				Protein Min = <span id="proteinMin-value"
 					style="display: inline-block; width: 240px; text-align: left">…</span>
+					<input type="range" min="0" max="35" id="proteinMin" value="0">
 			</label>
-			<input type="range" min="0" max="35" id="proteinMin" value="0">
+			
 		</p>
-		<label class="switch">
-			Create Pie Chart on hover
-			<input id="createPie" type="checkbox">
-		</label>
+		
 	</div>
 
 	<div id="chartHolder" class="flex-container">

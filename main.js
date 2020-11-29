@@ -102,7 +102,6 @@ d3.csv("starbucksfoods.csv", function (csv) {
         .style("stroke", "#00704A")
         .style("opacity", UNHIGLIGHT_OPACITY)
         .on('click', function (d) {
-            d3.select('#item').text(d.Item + ' - (' + d.Category + ')');            // shows name of selected item
             generatePieChart(d);
         })
         .on("mouseover", highlight)
@@ -161,6 +160,9 @@ d3.csv("starbucksfoods.csv", function (csv) {
 
     // function to create the pie chart of the % make-up of calories per macronutrient
     function generatePieChart(data) {
+
+        // Add text for the item
+        d3.select('#item').text(data.Item + ' - (' + data.Category + ')');
 
         d3.select('#totalCalories').text(data.Calories);
 
@@ -404,6 +406,7 @@ function initSliders() {
         d3.select("#proteinMin-value").text(+this.value);
         d3.select("#proteinMin").property("value", +this.value);
     });
+    
 } // initSliders
 
 /**
@@ -417,12 +420,24 @@ function resetSliders() {
     d3.select('#carbMax').property('value', 80);
     d3.select('#fiberMax').property('value', 25);
     d3.select('#proteinMax').property('value', 35);
+    // max text 
+    d3.select('#caloriesMax-value').text('650');
+    d3.select('#fatMax-value').text('40');
+    d3.select('#carbMax-value').text('80');
+    d3.select('#fiberMax-value').text('25');
+    d3.select('#proteinMax-value').text('35');
     // min sliders
     d3.select('#caloriesMin').property('value', 0);
     d3.select('#fatMin').property('value', 0);
     d3.select('#carbMin').property('value', 0);
     d3.select('#fiberMin').property('value', 0);
     d3.select('#proteinMin').property('value', 0);
+    // min text
+    d3.select('#caloriesMin-value').text('0');
+    d3.select('#fatMin-value').text('0');
+    d3.select('#carbMin-value').text('0');
+    d3.select('#fiberMin-value').text('0');
+    d3.select('#proteinMin-value').text('0');
 }
 
 function getStrokeWidth(numLines) {
