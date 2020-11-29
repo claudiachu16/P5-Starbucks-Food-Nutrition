@@ -158,7 +158,7 @@ d3.csv("starbucksfoods.csv", function (csv) {
         .outerRadius(radius);
 
     // --- pie initialization (end) ---
-
+    resetSliders()
     // function to create the pie chart of the % make-up of calories per macronutrient
     function generatePieChart(data) {
 
