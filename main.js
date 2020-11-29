@@ -13,7 +13,7 @@ d3.csv("starbucksfoods.csv", function (csv) {
 
 
     //margin values to format PCP within div
-    let margin = { top: 30, right: 10, bottom: 10, left: 0 },
+    let margin = { top: 30, right: 10, bottom: 10, left: -250 },
         width = 1500 - margin.left - margin.right,
         height = 800 - margin.top - margin.bottom;
 
