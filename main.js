@@ -2,7 +2,8 @@ let width = 1500;
 let height = 800;
 const radius = 200;
 const calories = [9, 4, 0, 4];        // # calories each macronutrient provides
-const pieChartColors = d3.scaleOrdinal(['gold', 'blueviolet', 'green', 'darksalmon'])   // fat, carb, fiber, protein
+const CARB_GREEN = '#2E603A', FAT_YELLOW = '#CB9947', PROTEIN_BLUE = '#186A8D';
+const pieChartColors = d3.scaleOrdinal([FAT_YELLOW, CARB_GREEN, 'crimson', PROTEIN_BLUE])   // fat, carb, fiber, protein (fiber should never show up)
 const MIN = 'min';
 const MAX = 'max';
 const STROKE_MULT = 1.5;
